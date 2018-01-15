@@ -1,0 +1,44 @@
+#include <vexMotor.h> // includes the vexMotor library (must also include Servo.h)
+#include <Servo.h>    // servo library -- vexMotor relies on the Servo library
+#include <Adafruit_MotorShield.h>
+
+vexMotor myVexMotor1;  // creates an instance of the vexMotor class
+vexMotor myVexMotor2;
+// create an instance for each motor that is connected
+// to your device.
+Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
+// Or, create it with a different I2C address (say for stacking)
+// Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
+
+// Select which 'port' M1, M2, M3 or M4. In this case, M1
+Adafruit_DCMotor *myMotor = AFMS.getMotor(1);
+
+void setup()
+{
+  myVexMotor1.attach(9); // setup / attach the vexMotor onto pin 9
+  //myVexMotor2.attach(10);
+  Serial.begin(9600);    // starts the Serial communication on Arduino
+ AFMS.begin();  // create with the default frequency 1.6KHz
+  //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  
+  // Set the speed to start, from 0 (off) to 255 (max speed)
+  myMotor->setSpeed(255);
+  myMotor->run(FORWARD);
+}
+
+void loop()
+ {
+  // put your main code here, to run repeatedly:
+  myVexMotor1.write(200);
+  //myVexMotor2.write(-200);
+  delay(3000);
+  myVexMotor1.write(-200);
+  //myVexMotor2.write(200);
+  delay(3000);
+  
+  //int sensorValue = analogRead(A0);
+  //Serial.println(sensorValue);
+}
+
+//write: sign changes direction max=255
+//detach; realeases pin
