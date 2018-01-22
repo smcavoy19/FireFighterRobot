@@ -2,8 +2,16 @@
 #include <Servo.h>    // servo library -- vexMotor relies on the Servo library
 #include <Adafruit_MotorShield.h>
 
+#define trigPin 13
+#define echoPin 12
+
+int fanPin = 3;
+
+
 vexMotor myVexMotor1;  // creates an instance of the vexMotor class
 vexMotor myVexMotor2;
+vexMotor myVexMotor3;  
+vexMotor myVexMotor4;
 // create an instance for each motor that is connected
 // to your device.
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
@@ -11,34 +19,109 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 // Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
 
 // Select which 'port' M1, M2, M3 or M4. In this case, M1
-Adafruit_DCMotor *myMotor = AFMS.getMotor(1);
-
+Adafruit_DCMotor *myMotor1 = AFMS.getMotor(1);
+Adafruit_DCMotor *myMotor2 = AFMS.getMotor(2);
+Adafruit_DCMotor *myMotor3 = AFMS.getMotor(3);
+Adafruit_DCMotor *myMotor4 = AFMS.getMotor(4);
 void setup()
 {
-  myVexMotor1.attach(9); // setup / attach the vexMotor onto pin 9
-  //myVexMotor2.attach(10);
   Serial.begin(9600);    // starts the Serial communication on Arduino
- AFMS.begin();  // create with the default frequency 1.6KHz
-  //AFMS.begin(1000);  // OR with a different frequency, say 1KHz
+  myVexMotor1.attach(9); // setup / attach the vexMotor onto pin 9
+  myVexMotor2.attach(10);
+  myVexMotor3.attach(11); 
+  myVexMotor4.attach(12);
+  
+  AFMS.begin();  // create with the default frequency 1.6KHz
+  
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  pinMode(fanPin, OUTPUT);
   
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  myMotor->setSpeed(255);
-  myMotor->run(FORWARD);
+  myMotor1->setSpeed(230); //move to methods
+  myMotor1->run(FORWARD);
+  myMotor2->setSpeed(230);
+  myMotor2->run(FORWARD);
+  myMotor3->setSpeed(230);
+  myMotor3->run(FORWARD);
+  myMotor4->setSpeed(230);
+  myMotor4->run(FORWARD);
 }
 
-void loop()
- {
-  // put your main code here, to run repeatedly:
+void loop(){
+  driveForward();
+  delay(3000);
+  driveBackward();
+  delay(3000);
+  driveDown();
+  delay(3000);
+  driveUp();
+  delay(3000);
+  stopMotors();
+  fanOn();
+  delay(3000);
+  fanOff();
+}
+
+bool isFire(){
+  int sensorValue = analogRead(A0);
+  if(sensorValue>100)
+    return(true);
+  else
+    return(false);
+}
+
+int ultraSonicSensor(){
+  long duration, distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2); // Sets the trigPin on HIGH state for 10 micro seconds
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW); // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration/58; // Calculating the distance
+  return(distance);
+}
+
+void fanOn(){
+  analogWrite(fanPin, 255);
+}
+
+void fanOff(){
+  analogWrite(fanPin, 0);
+}
+
+void stopMotors(){
+  myVexMotor2.write(0);
+  myVexMotor4.write(0);
+  myVexMotor1.write(0);
+  myVexMotor3.write(0);
+}
+
+void driveForward(){
   myVexMotor1.write(200);
-  //myVexMotor2.write(-200);
-  delay(3000);
-  myVexMotor1.write(-200);
-  //myVexMotor2.write(200);
-  delay(3000);
-  
-  //int sensorValue = analogRead(A0);
-  //Serial.println(sensorValue);
+  myVexMotor3.write(-200);
+  myVexMotor2.write(0);
+  myVexMotor4.write(0);
 }
 
-//write: sign changes direction max=255
-//detach; realeases pin
+void driveBackward(){
+  myVexMotor1.write(-200);
+  myVexMotor3.write(200);
+  myVexMotor2.write(0);
+  myVexMotor4.write(0);
+}
+
+void driveUp(){
+  myVexMotor2.write(200);
+  myVexMotor4.write(-200);
+  myVexMotor1.write(0);
+  myVexMotor3.write(0);
+}
+
+void driveDown(){
+  myVexMotor2.write(-200);
+  myVexMotor4.write(200);
+  myVexMotor1.write(0);
+  myVexMotor3.write(0);
+}
