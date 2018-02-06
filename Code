@@ -2,9 +2,6 @@
 #include <Servo.h>    // servo library -- vexMotor relies on the Servo library
 #include <Adafruit_MotorShield.h>
 
-#define trigPin 13
-#define echoPin 12
-
 int fanPin = 3;
 
 
@@ -29,27 +26,21 @@ void setup()
   myVexMotor1.attach(9); // setup / attach the vexMotor onto pin 9
   myVexMotor2.attach(10);
   myVexMotor3.attach(11); 
-  myVexMotor4.attach(12);
+  myVexMotor4.attach(8);
   
   AFMS.begin();  // create with the default frequency 1.6KHz
   
-  pinMode(trigPin, OUTPUT);
-  pinMode(echoPin, INPUT);
+  pinMode(1, OUTPUT);
+  pinMode(2, INPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, INPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, INPUT);
   pinMode(fanPin, OUTPUT);
-  
-  // Set the speed to start, from 0 (off) to 255 (max speed)
-  myMotor1->setSpeed(230); //move to methods
-  myMotor1->run(FORWARD);
-  myMotor2->setSpeed(230);
-  myMotor2->run(FORWARD);
-  myMotor3->setSpeed(230);
-  myMotor3->run(FORWARD);
-  myMotor4->setSpeed(230);
-  myMotor4->run(FORWARD);
 }
 
 void loop(){
-  driveForward();
+  /*driveForward();
   delay(3000);
   driveBackward();
   delay(3000);
@@ -61,6 +52,17 @@ void loop(){
   fanOn();
   delay(3000);
   fanOff();
+  delay(3000);*/
+  //Serial.println(isFire());
+  //Serial.print("Distance");
+  Serial.println(distUp());
+  if(distUp()>5){
+    driveUp();
+  }
+  else{
+    stopMotors();
+  }
+  fanOn();
 }
 
 bool isFire(){
@@ -71,24 +73,36 @@ bool isFire(){
     return(false);
 }
 
-int ultraSonicSensor(){
+int distUp(){
+  return(dist(1, 2));
+}
+
+int distDown(){
+  return(dist(4, 5));
+}
+
+int distForward(){
+  return(dist(6, 7));
+}
+
+int dist(int trig, int echo){
   long duration, distance;
-  digitalWrite(trigPin, LOW);
+  digitalWrite(trig, LOW);
   delayMicroseconds(2); // Sets the trigPin on HIGH state for 10 micro seconds
-  digitalWrite(trigPin, HIGH);
+  digitalWrite(trig, HIGH);
   delayMicroseconds(10);
-  digitalWrite(trigPin, LOW); // Reads the echoPin, returns the sound wave travel time in microseconds
-  duration = pulseIn(echoPin, HIGH);
+  digitalWrite(trig, LOW); // Reads the echoPin, returns the sound wave travel time in microseconds
+  duration = pulseIn(echo, HIGH);
   distance = duration/58; // Calculating the distance
   return(distance);
 }
 
 void fanOn(){
-  analogWrite(fanPin, 255);
+  digitalWrite(fanPin, HIGH);
 }
 
 void fanOff(){
-  analogWrite(fanPin, 0);
+  digitalWrite(fanPin, LOW);
 }
 
 void stopMotors(){
@@ -96,9 +110,35 @@ void stopMotors(){
   myVexMotor4.write(0);
   myVexMotor1.write(0);
   myVexMotor3.write(0);
+  myMotor1->run(RELEASE);
+  myMotor2->run(RELEASE);
+  myMotor3->run(RELEASE);
+  myMotor4->run(RELEASE);
 }
 
+void driveForwardBackwardHelper(){
+  myMotor1->setSpeed(180); 
+  myMotor1->run(FORWARD);
+  myMotor2->setSpeed(0);
+  myMotor2->run(RELEASE);
+  myMotor3->setSpeed(230);
+  myMotor3->run(FORWARD);
+  myMotor4->setSpeed(0);
+  myMotor4->run(RELEASE);
+}
+
+void driveUpDownHelper(){
+  myMotor1->setSpeed(0); 
+  myMotor1->run(RELEASE);
+  myMotor2->setSpeed(180);
+  myMotor2->run(FORWARD);
+  myMotor3->setSpeed(0);
+  myMotor3->run(RELEASE);
+  myMotor4->setSpeed(180);
+  myMotor4->run(FORWARD);
+}
 void driveForward(){
+  driveForwardBackwardHelper();
   myVexMotor1.write(200);
   myVexMotor3.write(-200);
   myVexMotor2.write(0);
@@ -106,6 +146,7 @@ void driveForward(){
 }
 
 void driveBackward(){
+  driveForwardBackwardHelper();
   myVexMotor1.write(-200);
   myVexMotor3.write(200);
   myVexMotor2.write(0);
@@ -113,6 +154,7 @@ void driveBackward(){
 }
 
 void driveUp(){
+  driveUpDownHelper();
   myVexMotor2.write(200);
   myVexMotor4.write(-200);
   myVexMotor1.write(0);
@@ -120,6 +162,7 @@ void driveUp(){
 }
 
 void driveDown(){
+  driveUpDownHelper();
   myVexMotor2.write(-200);
   myVexMotor4.write(200);
   myVexMotor1.write(0);
