@@ -2,15 +2,15 @@
 #include <Servo.h>    // servo library -- vexMotor relies on the Servo library
 #include <Adafruit_MotorShield.h>
 
-int fanPin = 3;
+//optimal distance to wall 10>x>5
 
+int fanPin = 3;
 
 vexMotor myVexMotor1;  // creates an instance of the vexMotor class
 vexMotor myVexMotor2;
 vexMotor myVexMotor3;  
 vexMotor myVexMotor4;
-// create an instance for each motor that is connected
-// to your device.
+
 Adafruit_MotorShield AFMS = Adafruit_MotorShield(); 
 // Or, create it with a different I2C address (say for stacking)
 // Adafruit_MotorShield AFMS = Adafruit_MotorShield(0x61); 
@@ -20,69 +20,63 @@ Adafruit_DCMotor *myMotor1 = AFMS.getMotor(1);
 Adafruit_DCMotor *myMotor2 = AFMS.getMotor(2);
 Adafruit_DCMotor *myMotor3 = AFMS.getMotor(3);
 Adafruit_DCMotor *myMotor4 = AFMS.getMotor(4);
-void setup()
-{
+
+void setup(){
   Serial.begin(9600);    // starts the Serial communication on Arduino
+  
+
   myVexMotor1.attach(9); // setup / attach the vexMotor onto pin 9
   myVexMotor2.attach(10);
   myVexMotor3.attach(11); 
   myVexMotor4.attach(8);
-  
-  AFMS.begin();  // create with the default frequency 1.6KHz
-  
-  pinMode(1, OUTPUT);
-  pinMode(2, INPUT);
-  pinMode(4, OUTPUT);
-  pinMode(5, INPUT);
-  pinMode(6, OUTPUT);
-  pinMode(7, INPUT);
-  pinMode(fanPin, OUTPUT);
+  AFMS.begin();
+
+  myMotor1->setSpeed(230); //move to methods  
+  myMotor1->run(FORWARD);
+  myMotor2->setSpeed(230);
+  myMotor2->run(FORWARD);
+  myMotor3->setSpeed(230);
+  myMotor3->run(FORWARD);
+  myMotor4->setSpeed(230);
+  myMotor4->run(FORWARD);
 }
 
 void loop(){
-  /*driveForward();
-  delay(3000);
-  driveBackward();
-  delay(3000);
-  driveDown();
-  delay(3000);
-  driveUp();
-  delay(3000);
-  stopMotors();
-  fanOn();
-  delay(3000);
-  fanOff();
-  delay(3000);*/
-  //Serial.println(isFire());
-  //Serial.print("Distance");
-  Serial.println(distUp());
-  if(distUp()>5){
+  int up = distUp();
+  int down = distDown();
+  int forward = distForward();
+  int backward = dsitBackward();
+  if(up > 10)
     driveUp();
-  }
-  else{
+  else
     stopMotors();
-  }
-  fanOn();
 }
 
-bool isFire(){
-  int sensorValue = analogRead(A0);
-  if(sensorValue>100)
-    return(true);
-  else
-    return(false);
-}
+
 
 int distUp(){
-  return(dist(1, 2));
+  pinMode(A0, OUTPUT);
+  pinMode(A1, INPUT);
+  return(dist(A0, A1));
 }
 
 int distDown(){
-  return(dist(4, 5));
+  pinMode(6, OUTPUT);
+  pinMode(7, INPUT);
+  return(dist(6, 7));
 }
 
 int distForward(){
-  return(dist(6, 7));
+  pinMode(4, OUTPUT);
+  pinMode(5, INPUT);
+  return(dist(4,5));
+  
+}
+
+int distBackward(){
+  pinMode(A2, OUTPUT);
+  pinMode(A3, INPUT);
+  return(dist(A2, A3));
 }
 
 int dist(int trig, int echo){
@@ -98,6 +92,7 @@ int dist(int trig, int echo){
 }
 
 void fanOn(){
+  pinMode(fanPin, OUTPUT);
   digitalWrite(fanPin, HIGH);
 }
 
@@ -106,65 +101,37 @@ void fanOff(){
 }
 
 void stopMotors(){
-  myVexMotor2.write(0);
-  myVexMotor4.write(0);
-  myVexMotor1.write(0);
+   myVexMotor2.write(0);
+   myVexMotor4.write(0);
+   myVexMotor1.write(0);
+   myVexMotor3.write(0);
+ }
+ 
+ void driveForward(){
+   myVexMotor1.write(200);
+   myVexMotor3.write(-200);
+   myVexMotor2.write(0);
+   myVexMotor4.write(0);
+ }
+ 
+ void driveBackward(){
+   myVexMotor1.write(-200);
+   myVexMotor3.write(200);
+   myVexMotor2.write(0);
+   myVexMotor4.write(0);
+ }
+ 
+ void driveUp(){
+  Serial.println("Up");
+   myVexMotor2.write(200);
+   myVexMotor4.write(-200);
+   myVexMotor1.write(0);
+   myVexMotor3.write(0);
+ }
+ 
+ void driveDown(){
+   myVexMotor2.write(-200);
+   myVexMotor4.write(200);
+   myVexMotor1.write(0);
   myVexMotor3.write(0);
-  myMotor1->run(RELEASE);
-  myMotor2->run(RELEASE);
-  myMotor3->run(RELEASE);
-  myMotor4->run(RELEASE);
-}
-
-void driveForwardBackwardHelper(){
-  myMotor1->setSpeed(180); 
-  myMotor1->run(FORWARD);
-  myMotor2->setSpeed(0);
-  myMotor2->run(RELEASE);
-  myMotor3->setSpeed(230);
-  myMotor3->run(FORWARD);
-  myMotor4->setSpeed(0);
-  myMotor4->run(RELEASE);
-}
-
-void driveUpDownHelper(){
-  myMotor1->setSpeed(0); 
-  myMotor1->run(RELEASE);
-  myMotor2->setSpeed(180);
-  myMotor2->run(FORWARD);
-  myMotor3->setSpeed(0);
-  myMotor3->run(RELEASE);
-  myMotor4->setSpeed(180);
-  myMotor4->run(FORWARD);
-}
-void driveForward(){
-  driveForwardBackwardHelper();
-  myVexMotor1.write(200);
-  myVexMotor3.write(-200);
-  myVexMotor2.write(0);
-  myVexMotor4.write(0);
-}
-
-void driveBackward(){
-  driveForwardBackwardHelper();
-  myVexMotor1.write(-200);
-  myVexMotor3.write(200);
-  myVexMotor2.write(0);
-  myVexMotor4.write(0);
-}
-
-void driveUp(){
-  driveUpDownHelper();
-  myVexMotor2.write(200);
-  myVexMotor4.write(-200);
-  myVexMotor1.write(0);
-  myVexMotor3.write(0);
-}
-
-void driveDown(){
-  driveUpDownHelper();
-  myVexMotor2.write(-200);
-  myVexMotor4.write(200);
-  myVexMotor1.write(0);
-  myVexMotor3.write(0);
-}
+ }
