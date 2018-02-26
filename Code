@@ -31,13 +31,13 @@ void setup(){
   myVexMotor4.attach(8);
   AFMS.begin();
 
-  myMotor1->setSpeed(230); //move to methods  
+  myMotor1->setSpeed(200); //move to methods  
   myMotor1->run(FORWARD);
-  myMotor2->setSpeed(230);
+  myMotor2->setSpeed(200);
   myMotor2->run(FORWARD);
-  myMotor3->setSpeed(230);
+  myMotor3->setSpeed(200);
   myMotor3->run(FORWARD);
-  myMotor4->setSpeed(230);
+  myMotor4->setSpeed(200);
   myMotor4->run(FORWARD);
 }
 
@@ -45,14 +45,32 @@ void loop(){
   int up = distUp();
   int down = distDown();
   int forward = distForward();
-  int backward = dsitBackward();
-  if(up > 10)
-    driveUp();
+  int backward = distBackward();
+  if(down > 20)
+    driveDown();
   else
     stopMotors();
 }
 
-
+void checkRoutes(int down, int up, int forward, int backward){
+  if(up > 10){
+    Serial.print("");
+    //add Up to Array
+  }
+  if(down > 10){
+    Serial.print("");
+    //add Down to Array
+  }
+  if(forward > 10){
+    Serial.print("");
+    //add Forward to Array
+  }
+  if(backward > 10){
+    Serial.print("");
+    //add Backward to Array
+  }
+  //return array
+}
 
 int distUp(){
   pinMode(A0, OUTPUT);
@@ -123,15 +141,15 @@ void stopMotors(){
  
  void driveUp(){
   Serial.println("Up");
-   myVexMotor2.write(200);
+   myVexMotor2.write(175);
    myVexMotor4.write(-200);
    myVexMotor1.write(0);
    myVexMotor3.write(0);
  }
  
  void driveDown(){
-   myVexMotor2.write(-200);
-   myVexMotor4.write(200);
+   myVexMotor2.write(-17/0);
+   myVexMotor4.write(150);
    myVexMotor1.write(0);
   myVexMotor3.write(0);
  }
