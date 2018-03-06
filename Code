@@ -5,6 +5,8 @@
 //optimal distance to wall 10>x>5
 
 int fanPin = 3;
+bool go = true;
+bool foundWall = false;
 
 vexMotor myVexMotor1;  // creates an instance of the vexMotor class
 vexMotor myVexMotor2;
@@ -31,14 +33,16 @@ void setup(){
   myVexMotor4.attach(8);
   AFMS.begin();
 
-  myMotor1->setSpeed(200); //move to methods  
+  myMotor1->setSpeed(230); //move to methods  
   myMotor1->run(FORWARD);
-  myMotor2->setSpeed(200);
+  myMotor2->setSpeed(230);
   myMotor2->run(FORWARD);
-  myMotor3->setSpeed(200);
+  myMotor3->setSpeed(230);
   myMotor3->run(FORWARD);
-  myMotor4->setSpeed(200);
+  myMotor4->setSpeed(230);
   myMotor4->run(FORWARD);
+  
+  
 }
 
 void loop(){
@@ -46,31 +50,71 @@ void loop(){
   int down = distDown();
   int forward = distForward();
   int backward = distBackward();
-  if(down > 20)
-    driveDown();
-  else
-    stopMotors();
+
+  /*driveUp();
+  delay(2000);
+  while(up > 20 || up == 0){
+    //forward = distForward();
+    //if(forward > 20 && forward == 0)
+     // break;
+    up = distUp();
+    delay(200);
+  }
+  stopMotors();
+  delay(1000);
+  while(true){
+    Serial.println("ON");
+    Serial.println(distUp());
+    Serial.println(distDown());
+    delay(1000);
+  }*/
+  
+  
+
+  
+  driveUp();
+  Serial.print("UP:");
+  Serial.println(up);
+  while(up > 20 || up == 0){
+    up = distUp();
+    delay(100);
+  }
+  stopMotors();
+  delay(500);
+  forward = distForward();
+  Serial.print("Forward:");
+  Serial.println(forward);
+  driveForward();
+  while(forward > 20 || forward == 0){
+    Serial.println(forward);
+    forward = distForward();
+    delay(100);
+  }
+  stopMotors();
+  delay(500);
+  Serial.print("Down:");
+  driveDown();
+  down = distDown();
+  Serial.println(down);
+  while(down > 20 || down == 0){
+    down = distDown();
+    delay(100);
+  }
+  stopMotors();
+  delay(500);
+  Serial.print("Backward:");
+  driveBackward();
+  Serial.println(backward);
+  backward = distBackward();
+  while(backward > 20 || backward == 0){
+    backward = distBackward();
+    delay(100);
+  }
+  stopMotors();
+  delay(500);
 }
 
-void checkRoutes(int down, int up, int forward, int backward){
-  if(up > 10){
-    Serial.print("");
-    //add Up to Array
-  }
-  if(down > 10){
-    Serial.print("");
-    //add Down to Array
-  }
-  if(forward > 10){
-    Serial.print("");
-    //add Forward to Array
-  }
-  if(backward > 10){
-    Serial.print("");
-    //add Backward to Array
-  }
-  //return array
-}
+
 
 int distUp(){
   pinMode(A0, OUTPUT);
@@ -126,30 +170,30 @@ void stopMotors(){
  }
  
  void driveForward(){
-   myVexMotor1.write(200);
-   myVexMotor3.write(-200);
+   myVexMotor1.write(165);
+   myVexMotor3.write(-270);
    myVexMotor2.write(0);
    myVexMotor4.write(0);
  }
  
  void driveBackward(){
-   myVexMotor1.write(-200);
-   myVexMotor3.write(200);
+   myVexMotor1.write(-225);
+   myVexMotor3.write(235);
    myVexMotor2.write(0);
    myVexMotor4.write(0);
  }
  
  void driveUp(){
   Serial.println("Up");
-   myVexMotor2.write(175);
-   myVexMotor4.write(-200);
+   myVexMotor2.write(170);
+   myVexMotor4.write(-245);
    myVexMotor1.write(0);
    myVexMotor3.write(0);
  }
  
  void driveDown(){
-   myVexMotor2.write(-17/0);
-   myVexMotor4.write(150);
+   myVexMotor2.write(-215);
+   myVexMotor4.write(180);
    myVexMotor1.write(0);
   myVexMotor3.write(0);
  }
